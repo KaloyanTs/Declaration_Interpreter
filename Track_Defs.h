@@ -20,6 +20,16 @@ struct Var{
 void show(ofstream &of, const Var v, const int lvl, int &mem, int &bit_part);
 void show(ofstream &of, const Type t, const int lvl, int &mem, int &bit_part){
     int temp=mem;
+    if(strstr(t.name,"union")!=NULL){
+        for(int i=0;i<t.ct;i++){
+                    if(strstr(t.t[i-1].tp.name,"bit")!=NULL){
+                        bit_part+=t.t[i-1].tp.bitPart;
+                        mem+=bit_part/8;
+                        bit_part%=8;
+                    }
+                show(of,t.t[i],lvl,mem,bit_part);}
+        return;
+    }
     for(int i=0;i<t.ct;i++){
             if(!i)show(of,t.t[i],lvl,mem,bit_part);
             else {
@@ -270,12 +280,13 @@ Type Struct_OneLine(ifstream &f, char *s){
     return temp;
 }
 
-void Struct_Def(ifstream &f,char *s,Var *v,int &n){
+void Struct_Def(ifstream &f,char *s,Var *v,int &n, bool isUnion){
 
     int c=0,cc=0;
     Var vv;Type temp;
     char ar_n[8];
-    strcpy(vv.tp.name,"struct");
+    if(!isUnion)strcpy(vv.tp.name,"struct");
+    else strcpy(vv.tp.name,"union");
     vv.tp.t=new Var[32];
     if(strstr(s,"}")!=NULL&&
        (strstr(s,"//")!=NULL?strstr(s,"//")-strstr(s,"}")>0:1))
@@ -291,7 +302,9 @@ void Struct_Def(ifstream &f,char *s,Var *v,int &n){
                       vv.tp.size+=(cc%8?cc/8+1:cc/8);
                    }
                 if(strstr(s,"enum")!=NULL)Enum_def(f,s,vv.tp.t,vv.tp.ct);
-                vv.tp.size+=Simple_Def(f,s,vv.tp.t,vv.tp.ct);
+                if(strstr(s,"union")!=NULL)Struct_Def(f,s,vv.tp.t,vv.tp.ct,true);
+                if(!isUnion)vv.tp.size+=Simple_Def(f,s,vv.tp.t,vv.tp.ct);
+                else vv.tp.size=Simple_Def(f,s,vv.tp.t,vv.tp.ct);
             }
             if(strstr(s,"}")==NULL)f.getline(s,300);
         }
@@ -350,6 +363,7 @@ void New_Type(ifstream &f,char *s){
                       temp.size+=(cc%8?cc/8+1:cc/8);
                }
             if(strstr(s,"enum")!=NULL)Enum_def(f,s,temp.t,temp.ct);
+            if(strstr(s,"union")!=NULL)Struct_Def(f,s,temp.t,temp.ct,true);
             if(strstr(s,",")!=NULL)temp.size+=Simple_Def(f,s,temp.t,temp.ct);
             else{
                 if(Simple_Def(f,s,temp.t,temp.ct)==-1)continue;
@@ -380,7 +394,8 @@ void Proceed_Line(ifstream &f,char *s){
                     {Skip_Functions(f,s);return;}
             }
             if(strstr(s,"typedef")!=NULL){New_Type(f,s);return;}
-            if(strstr(s,"struct")!=NULL){Struct_Def(f,s,V,N);return;}
+            if(strstr(s,"struct")!=NULL){Struct_Def(f,s,V,N,false);return;}
+            if(strstr(s,"union")!=NULL){Struct_Def(f,s,V,N,true);return;}
             if(Simple_Def(f,s,V,N)!=-1)return;
 
 }
