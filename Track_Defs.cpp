@@ -44,13 +44,13 @@ void show(ofstream &of, const Type t, const int lvl, int &mem, int &bit_part){
     mem=temp;
 }
 void show(ofstream &of, const Var v, const int lvl,int &mem, int &bit_part){
-    for(int i=0;i<lvl;i++){//cout<<"  ";
+    for(int i=0;i<lvl;i++){cout<<"  ";
                            of<<"  ";}
     if(strstr(v.name,"[0]")!=NULL)mem=arr_mem;
-    if(strstr(v.tp.name,"bit")==NULL&&bit_part){bit_part=0;mem++;}
-    //cout<<lvl+1<<';'<<v.name<<';'<<v.tp.name<<';'<<mem;
-    //if(bit_part)cout<<'.'<<bit_part;
-    //cout<<endl;
+    if(strstr(v.tp.name,"bit")==NULL&&bit_part){if(bit_part!=7)mem++;bit_part=0;}
+    cout<<lvl+1<<';'<<v.name<<';'<<v.tp.name<<';'<<mem;
+    if(bit_part||!strcmp(v.tp.name,"bit"))cout<<'.'<<bit_part;
+    cout<<endl;
     of<<lvl+1<<';'<<v.name<<';'<<v.tp.name<<';'<<mem;
     if(bit_part)of<<'.'<<bit_part;
     of<<endl;
@@ -72,12 +72,17 @@ void show(ofstream &of, const Var v, const int lvl,int &mem, int &bit_part){
                  {"float",4,NULL},{"int",2,NULL}};
 Var V[1000];int N=0;
 
+void MultipleComment(ifstream &f, char *s){
+    if(strstr(s,"/*")!=NULL){while(strstr(s,"*/")==NULL)f.getline(s,300);f.getline(s,300);}
+}
+
 void Define_def(ifstream &f,char *s){
     while(strstr(s,"\\")!=NULL&&(*s!='\0'&&(s[0]!='/'||s[1]!='/'))){
         f.getline(s,300);
     }
     f.getline(s,300);
     if(strstr(s,"#")!=NULL){Define_def(f,s);return;}
+    MultipleComment(f,s);
 }
 
 void Enum_def(ifstream &f,char *s,Var *v,int &n){
@@ -104,9 +109,6 @@ void Enum_def(ifstream &f,char *s,Var *v,int &n){
         vv.tp=T[0];
         v[n++]=vv;
     }
-
-    //f.getline(s,300);
-    //if(strstr(s,"enum")!=NULL)Enum_def(f,s,v,n);
 }
 int Simple_Def(ifstream &f, char *s,Var *v,int &n);
 
@@ -204,7 +206,8 @@ int Simple_Def(ifstream &f, char *s,Var *v,int &n){
 multiple:
     a=strstr(s,",");
     if(a==NULL||(strstr(s,"//")!=NULL?strstr(s,"//")-strstr(s,",")<0:0))return vv.tp.size;
-    if(s[strlen(s)-1]==','){char nn[300];f.getline(nn,300);strcat(s,nn);}
+    char nn[300];
+    while(s[strlen(s)-1]==','){f.getline(nn,300);strcat(s,nn);}
     char next_dec[300];
     b=strstr(vv.tp.name,"[");
     if(b!=NULL)*b=0;
@@ -281,13 +284,12 @@ Type Struct_OneLine(ifstream &f, char *s){
 }
 
 void Struct_Def(ifstream &f,char *s,Var *v,int &n, bool isUnion){
-
     int c=0,cc=0;
     Var vv;Type temp;
     char ar_n[8];
     if(!isUnion)strcpy(vv.tp.name,"struct");
     else strcpy(vv.tp.name,"union");
-    vv.tp.t=new Var[32];
+    vv.tp.t=new Var[64];
     if(strstr(s,"}")!=NULL&&
        (strstr(s,"//")!=NULL?strstr(s,"//")-strstr(s,"}")>0:1))
        vv.tp=Struct_OneLine(f,s);
@@ -301,7 +303,7 @@ void Struct_Def(ifstream &f,char *s,Var *v,int &n, bool isUnion){
                       cc=Bit_Field(f,s,vv.tp.t,vv.tp.ct);
                       vv.tp.size+=(cc%8?cc/8+1:cc/8);
                    }
-                if(strstr(s,"enum")!=NULL)Enum_def(f,s,vv.tp.t,vv.tp.ct);
+                while(strstr(s,"enum")!=NULL){Enum_def(f,s,vv.tp.t,vv.tp.ct);f.getline(s,300);}
                 if(strstr(s,"union")!=NULL)Struct_Def(f,s,vv.tp.t,vv.tp.ct,true);
                 if(!isUnion)vv.tp.size+=Simple_Def(f,s,vv.tp.t,vv.tp.ct);
                 else vv.tp.size=Simple_Def(f,s,vv.tp.t,vv.tp.ct);
@@ -362,7 +364,7 @@ void New_Type(ifstream &f,char *s){
                       cc=Bit_Field(f,s,temp.t,temp.ct);
                       temp.size+=(cc%8?cc/8+1:cc/8);
                }
-            if(strstr(s,"enum")!=NULL)Enum_def(f,s,temp.t,temp.ct);
+            if(strstr(s,"enum")!=NULL){Enum_def(f,s,temp.t,temp.ct);f.getline(s,300);}
             if(strstr(s,"union")!=NULL)Struct_Def(f,s,temp.t,temp.ct,true);
             if(strstr(s,",")!=NULL)temp.size+=Simple_Def(f,s,temp.t,temp.ct);
             else{
@@ -380,8 +382,9 @@ void New_Type(ifstream &f,char *s){
 }
 
 void Proceed_Line(ifstream &f,char *s){
+
             if(s[0]=='/'&&s[1]=='/')return;
-            if(strstr(s,"/*")!=NULL){while(strstr(s,"*/")==NULL)f.getline(s,300);f.getline(s,300);}
+            MultipleComment(f,s);
             if(strstr(s,"#")!=NULL)Define_def(f,s);
             if(strstr(s,"enum")!=NULL){Enum_def(f,s,V,N);return;}
             if(strstr(s,"const")!=NULL){
@@ -415,7 +418,6 @@ int main(){
     do{
         cout<<"Path to file: ";
         cin.getline(path,128);
-        //if(*s=='\0')strcpy(path,"Defs.h");
         F.open(path);
     }while(!F.is_open());
     char *u=&path[strlen(path)];
@@ -423,9 +425,9 @@ int main(){
     *(++u)=0;
     strcat(path,"data_single.txt");
     ofstream data(path);
-    //ofstream data("data.txt",ios::app);   //include in the end for the whole folder
     while(!F.eof()){
         F.getline(s,300);
+        //cout<<s<<endl;
         if(*s)Proceed_Line(F,s);
     }
     F.close();

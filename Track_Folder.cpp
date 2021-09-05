@@ -17,8 +17,6 @@ bool isSearched(char *file){
 
 void Search_Files(char *path, char *file, int lvl){
     if(isSearched(file))return;
-    //strcpy(V[N++].name,path);
-    //strcat(V[N-1].name,file);
     char s[300];
     char c[4];
     for(int i=0;i<lvl;i++)cout<<"  ";cout<<lvl+1<<"->";
@@ -39,7 +37,7 @@ void Search_Files(char *path, char *file, int lvl){
             *b='\"';
         }
         else
-            if(*s&&strstr(file,".c")==NULL){Proceed_Line(f,s);}
+            if(*s&&strstr(file,".c")==NULL)Proceed_Line(f,s);
     }
     f.close();
 }
