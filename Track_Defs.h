@@ -43,7 +43,7 @@ void show(ofstream &of, const Type t, const int lvl, int &mem, int &bit_part){
 void show(ofstream &of, const Var v, const int lvl,int &mem, int &bit_part){
     for(int i=0;i<lvl;i++){of<<"  ";}
     if(strstr(v.name,"[0]")!=NULL)mem=arr_mem;
-    if(strstr(v.tp.name,"bit")==NULL&&bit_part){if(bit_part!=7)mem++;bit_part=0;}
+    if(strstr(v.tp.name,"bit")==NULL&&bit_part)bit_part=0;
     of<<lvl+1<<';'<<v.name<<';'<<v.tp.name<<';'<<mem;
     if(bit_part||!strcmp(v.tp.name,"bit"))of<<'.'<<bit_part;
     of<<endl;
