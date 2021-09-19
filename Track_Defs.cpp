@@ -58,8 +58,8 @@ void show(ofstream &of, const Var v, const int lvl,int &mem, int &bit_part){
     show(of,v.tp,lvl+1,mem,bit_part);
 }
 
- int types_Count=22;
- Type T[1000]={  {"enum",1,NULL},{"void",0,NULL},
+ int types_Count=23;
+ Type T[1000]={  {"bit",0,NULL},{"enum",1,NULL},{"void",0,NULL},
                  {"unsigned short int",1,NULL},{"signed short int",1,NULL},
                  {"unsigned long int",4,NULL},{"unsigned long",4,NULL},
                  {"signed long int",4,NULL},{"signed long",4,NULL},
@@ -207,7 +207,10 @@ multiple:
     a=strstr(s,",");
     if(a==NULL||(strstr(s,"//")!=NULL?strstr(s,"//")-strstr(s,",")<0:0))return vv.tp.size;
     char nn[300];
+    char *y=&s[strlen(s)-1];
+    while(*y==' ')*(y--)=0;
     while(s[strlen(s)-1]==','){f.getline(nn,300);strcat(s,nn);}
+
     char next_dec[300];
     b=strstr(vv.tp.name,"[");
     if(b!=NULL)*b=0;

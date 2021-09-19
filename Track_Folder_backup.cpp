@@ -2,7 +2,6 @@
 #include <cstring>
 #include <fstream>
 #include <dirent.h>
-#include <stdio.h>
 #include "Track_Defs.h"
 using namespace std;
 int C=0,fileC=0;
@@ -45,11 +44,8 @@ void Search_Files(char *path, char *file, int lvl){
 
 int main(){
     char path[300],s[200],t[300];
-    const char* fileName="Path.txt";
     int c=0;
-    ifstream p;p.open(fileName);
-    p.getline(t,300);
-    p.close();
+    cin.getline(t,300);
     for(int i=0;i<strlen(t);i++){
         if(t[i]=='\\')path[c++]='\\';
         path[c++]=t[i];
@@ -69,11 +65,9 @@ int main(){
             strcat(path,"\\\\");
             Search_Files(path,d->d_name,0);
             Show_Res(data);
-            data.close();
             break;
         }
         closedir(dr);
     }
-        remove(fileName);
         return 0;
 }
