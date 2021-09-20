@@ -35,6 +35,7 @@ void show(ofstream &of, const Type t, const int lvl, int &mem, int &bit_part){
                         bit_part+=t.t[i-1].tp.bitPart;
                         mem+=bit_part/8;
                         bit_part%=8;
+                        if(strstr(t.t[i].tp.name,"bit")==NULL&&bit_part%8)mem++;
                     }
                 show(of,t.t[i],lvl,mem,bit_part);}
     }
@@ -99,9 +100,10 @@ void Enum_def(ifstream &f,char *s,Var *v,int &n){
     else{
         Var vv;
         strcpy(vv.name,name);
-        vv.tp=T[0];
+        vv.tp=T[1];
         v[n++]=vv;
     }
+
 
 }
 int Simple_Def(ifstream &f, char *s,Var *v,int &n);
@@ -301,8 +303,10 @@ void Struct_Def(ifstream &f,char *s,Var *v,int &n, bool isUnion){
                    }
                 while(strstr(s,"enum")!=NULL){Enum_def(f,s,vv.tp.t,vv.tp.ct);f.getline(s,300);}
                 if(strstr(s,"union")!=NULL)Struct_Def(f,s,vv.tp.t,vv.tp.ct,true);
-                if(!isUnion)vv.tp.size+=Simple_Def(f,s,vv.tp.t,vv.tp.ct);
-                else vv.tp.size=Simple_Def(f,s,vv.tp.t,vv.tp.ct);
+                int check=Simple_Def(f,s,vv.tp.t,vv.tp.ct);
+                if(check==-1)check=0;
+                if(!isUnion)vv.tp.size+=check;
+                else vv.tp.size=check;
             }
             if(strstr(s,"}")==NULL)f.getline(s,300);
         }
@@ -360,13 +364,22 @@ void New_Type(ifstream &f,char *s){
                       cc=Bit_Field(f,s,temp.t,temp.ct);
                       temp.size+=(cc%8?cc/8+1:cc/8);
                }
-            if(strstr(s,"enum")!=NULL){Enum_def(f,s,temp.t,temp.ct);f.getline(s,300);}
+            if(strstr(s,"enum")!=NULL)
+                {   int ll=temp.ct;
+                    Enum_def(f,s,temp.t,temp.ct);
+                    f.getline(s,300);
+                    for(int i=ll;ll<temp.ct;ll++)temp.size+=temp.t[i].tp.size;
+                }
             if(strstr(s,"union")!=NULL)Struct_Def(f,s,temp.t,temp.ct,true);
-            if(strstr(s,",")!=NULL)temp.size+=Simple_Def(f,s,temp.t,temp.ct);
+            if(strstr(s,",")!=NULL)
+                {int check=Simple_Def(f,s,temp.t,temp.ct);
+                 if(check==-1)check=0;
+                 temp.size+=check;}
             else{
                 if(Simple_Def(f,s,temp.t,temp.ct)==-1)continue;
                     temp.size+=temp.t[temp.ct-1].tp.size;
             }
+
         }while(strstr(s,"}")==NULL);
     }
     char *a=strstr(s,"}")+1;

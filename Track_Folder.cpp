@@ -20,12 +20,12 @@ void Search_Files(char *path, char *file, int lvl){
     if(isSearched(file))return;
     char s[300];
     char c[4];
-    for(int i=0;i<lvl;i++)cout<<"  ";cout<<lvl+1<<"->";
-    cout<<path<<file<<endl;
+    //for(int i=0;i<lvl;i++)cout<<"  ";cout<<lvl+1<<"->";
+    //cout<<path<<file<<endl;
     ifstream f;
     strcpy(s,path);strcat(s,file);
     f.open(s);
-    if(!f.is_open()){cout<<file<<" does not exist!"<<endl;return;}
+    if(!f.is_open()){/*cout<<file<<" does not exist!"<<endl;*/return;}
     while(!f.eof()){
         f.getline(s,300);
         if(strstr(s,"#include")!=NULL){
