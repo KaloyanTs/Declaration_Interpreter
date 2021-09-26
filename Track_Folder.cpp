@@ -3,8 +3,13 @@
 #include <fstream>
 #include <dirent.h>
 #include <stdio.h>
+#include <ctime>
+#include <iomanip>
 #include "Track_Defs.h"
 using namespace std;
+#define VERSION "1.0"
+#define AUTHOR "KaloyanTs"
+#define ProjectNAME "Track_Folder"
 int C=0,fileC=0;
 char files[32][32];
 
@@ -43,7 +48,7 @@ void Search_Files(char *path, char *file, int lvl){
     f.close();
 }
 
-int main(){
+int main(int argc, char** argv){
     char path[300],s[200],t[300];
     const char* fileName="Path.txt";
     int c=0;
@@ -58,6 +63,15 @@ int main(){
     strcpy(s,path);
     strcat(s,"\\data.txt");
     ofstream data(s);
+    data<<ProjectNAME<<".exe V"<<VERSION<<" by "<<AUTHOR<<endl;
+    time_t timet = time(0);   // get time now
+    struct tm * now = localtime( & timet );
+    data <<now->tm_mday << '/'
+         <<setw(2)<<setfill('0')<<(now->tm_mon + 1) << '/'
+         <<(now->tm_year + 1900)<<' '
+         <<setw(2)<<setfill('0')<<now->tm_hour<<':'
+         <<setw(2)<<setfill('0')<<now->tm_min<<endl;
+    data <<t;
     struct dirent *d;
     DIR *dr;
     dr = opendir(path);
@@ -66,8 +80,8 @@ int main(){
         for(d=readdir(dr); d!=NULL; d=readdir(dr))
         {
            if(d->d_name[d->d_namlen-1]!='c'||d->d_name[d->d_namlen-2]!='.')continue;
-            strcat(path,"\\\\");
             Search_Files(path,d->d_name,0);
+            data<<d->d_name<<endl;
             Show_Res(data);
             data.close();
             break;
