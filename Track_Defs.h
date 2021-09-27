@@ -83,12 +83,21 @@ void Enum_def(ifstream &f,char *s,Var *v,int &n){
     char name[32];
     char * newt=strstr(s,"typedef");
     int c=0;
+    bool mult=false;
     while(strstr(s,";")==NULL){
         f.getline(s,300);
     }
     char *a=strstr(s,"}")+1;
     while(*a==' '){a++;}
-    while(*a!=';'&&*a!=' ')name[c++]=*(a++);
+    while(*a!=';'&&*a!=' '){
+            if(*a==','){
+                *a=' ';
+                mult=true;
+                break;
+            }
+            name[c++]=*(a++);
+            *(a-1)=' ';
+    }
     if(!c)return;
     name[c++]=0;
     if(newt!=NULL){
@@ -102,9 +111,9 @@ void Enum_def(ifstream &f,char *s,Var *v,int &n){
         strcpy(vv.name,name);
         vv.tp=T[1];
         v[n++]=vv;
+
     }
-
-
+    if(mult)Enum_def(f,s,v,n);
 }
 int Simple_Def(ifstream &f, char *s,Var *v,int &n);
 
@@ -161,11 +170,14 @@ int Simple_Def(ifstream &f, char *s,Var *v,int &n){
     }
     else{
         for(int i=0;i<types_Count;i++){
+            int l=strlen(T[i].name);
+            T[i].name[l++]=' ';T[i].name[l--]=0;
             a=strstr(s,T[i].name);
+            T[i].name[l]=0;
             if (a!=NULL){vv.tp=T[i];a+=strlen(T[i].name);break;}
             if(i==types_Count-1)return -1;
         }
-        if(strstr(s,"*")!=NULL){
+        if(strstr(s,"*")!=NULL&&(strstr(s,"//")!=NULL?strstr(s,"//")-strstr(s,"*")>0:1)){
                 strcat(vv.tp.name,"*");
                 vv.tp.size=(strstr(s,"const")!=NULL?3:2);
                 vv.tp.ct=0;
@@ -293,7 +305,7 @@ void Struct_Def(ifstream &f,char *s,Var *v,int &n, bool isUnion){
        vv.tp=Struct_OneLine(f,s);
     else{
         f.getline(s,300);
-        while(strstr(s,"}")==NULL){
+        while(strstr(s,"}")==NULL||strstr(s,"enum")!=NULL){
             if(s[0]!='/'||s[1]!='/'&&*s!='\0'){
                 if(strstr(s,":")!=NULL&&
                    (strstr(s,"//")!=NULL?strstr(s,"//")-strstr(s,":")>0:1)

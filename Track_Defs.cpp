@@ -165,7 +165,10 @@ int Simple_Def(ifstream &f, char *s,Var *v,int &n){
     }
     else{
         for(int i=0;i<types_Count;i++){
+            int l=strlen(T[i].name);
+            T[i].name[l++]=' ';T[i].name[l--]=0;
             a=strstr(s,T[i].name);
+            T[i].name[l]=0;
             if (a!=NULL){vv.tp=T[i];a+=strlen(T[i].name);break;}
             if(i==types_Count-1)return -1;
         }
