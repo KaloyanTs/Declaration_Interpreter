@@ -45,6 +45,7 @@ char *extractDay(char *df,char *d){
 char *extractSec(char *df,char *s){
     *s=0;
     char *a=strstr(df,"s");
+    if (a==NULL){a=strstr(df,"S");}
     if (a==NULL)return s;
     if(*(a+1)=='s'){
         s[0]=now->tm_sec/10+'0';
@@ -73,10 +74,12 @@ char *extractMin(char *df,char *m){
 char *extractHour(char *df,char *h){
     *h=0;
     char *a=strstr(df,"h");
+    if (a==NULL){a=strstr(df,"H");}
+    if (a==NULL)return h;
     int hh=now->tm_hour;
     if(strstr(df,"tt")!=NULL&&hh!=12)hh%=12;
     if (a==NULL)return h;
-    if(*(a+1)=='h'){
+    if(*(a+1)=='h'||*(a+1)=='H'){
         h[0]=hh/10+'0';
         h[1]=hh%10+'0';
         h[2]=0;
@@ -92,7 +95,7 @@ char *extractMonth(char *df,char *m){
     char *a=strstr(df,"M");
     if (a==NULL)return m;
     mc=1;
-    while(*(++a)=='m'){mc++;}
+    while(*(++a)=='M'){mc++;}
     switch(mc){
     case 1:
         itoa(now->tm_mon+1,m,10);
@@ -173,11 +176,12 @@ char* makeTime(char* curT){
     for(int i=0;i<strlen(df);i++){
         switch(df[i]){
         case 's':
+        case 'S':
             char s[8];
             curT[dC]=0;
             strcat(curT,extractSec(df,s));
             dC+=strlen(s);
-            while(df[i+1]=='s'){i++;};
+            while(df[i+1]=='s'||df[i+1]=='S'){i++;};
             break;
         case 'm':
             char m[8];
@@ -187,15 +191,16 @@ char* makeTime(char* curT){
             while(df[i+1]=='m'){i++;};
             break;
         case 'h':
+        case 'H':
             char h[8];
             curT[dC]=0;
             strcat(curT,extractHour(df,h));
             dC+=strlen(h);
-            while(df[i+1]=='h'){i++;};
+            while(df[i+1]=='h'||df[i+1]=='H'){i++;};
             break;
         case 't':
             curT[dC]=0;
-            if(now->tm_hour>11&&!(now->tm_hour==12&&(!now->tm_min&&!now->tm_sec)))strcat(curT,"PM");
+            if(now->tm_hour>11)strcat(curT,"PM");
             else strcat(curT,"AM");
             dC+=2;
             while(df[i+1]=='t'){i++;};
