@@ -47,23 +47,43 @@ void show(ofstream &of, const Var v, const int lvl,int &mem, int &bit_part){
     if(strstr(v.tp.name,"bit")==NULL&&bit_part)bit_part=0;
     of<<lvl+1<<';'<<v.name<<';'<<v.tp.name<<';'<<mem;
     if(bit_part||!strcmp(v.tp.name,"bit"))of<<'.'<<bit_part;
+    of<<';';
+    if(strchr(v.tp.name,'*'))
+    of<<v.tp.size;
+    else if(!strstr(v.tp.name,"bit") && !v.tp.t)of<<v.tp.size;
+    else of<<'-';
     of<<endl;
     if(strstr(v.tp.name,"[")!=NULL)arr_mem=mem;
     show(of,v.tp,lvl+1,mem,bit_part);
 }
 
  int types_Count=23;
- Type T[1000]={  {"bit",0,NULL},{"enum",1,NULL},{"void",0,NULL},
-                 {"unsigned short int",1,NULL},{"signed short int",1,NULL},
-                 {"unsigned long int",4,NULL},{"unsigned long",4,NULL},
-                 {"signed long int",4,NULL},{"signed long",4,NULL},
-                 {"long double",4,NULL},{"double",4,NULL},
-                 {"long int",4,NULL},{"long",4,NULL},
-                 {"unsigned short",1,NULL},{"unsigned char",1,NULL},
-                 {"signed char",1,NULL},{"char",1,NULL},
-                 {"unsigned int",2,NULL},{"signed int",2,NULL},
-                 {"unsigned",2,NULL},{"short",1,NULL},
-                 {"float",4,NULL},{"int",2,NULL}};
+ Type T[1000];
+void initTypes(){
+    strcpy(T[0].name,"bit");T[0].size=0;T[0].t=NULL;
+    strcpy(T[1].name,"enum");T[1].size=1;T[1].t=NULL;
+    strcpy(T[2].name,"void");T[2].size=0;T[2].t=NULL;
+    strcpy(T[3].name,"unsigned short int");T[3].size=1;T[3].t=NULL;
+    strcpy(T[4].name,"signed short int");T[4].size=1;T[4].t=NULL;
+    strcpy(T[5].name,"unsigned long int");T[5].size=4;T[5].t=NULL;
+    strcpy(T[6].name,"unsigned long");T[6].size=4;T[6].t=NULL;
+    strcpy(T[7].name,"signed long int");T[7].size=4;T[7].t=NULL;
+    strcpy(T[8].name,"signed long");T[8].size=4;T[8].t=NULL;
+    strcpy(T[9].name,"long double");T[9].size=4;T[9].t=NULL;
+    strcpy(T[10].name,"double");T[10].size=4;T[10].t=NULL;
+    strcpy(T[11].name,"long int");T[11].size=4;T[11].t=NULL;
+    strcpy(T[12].name,"long");T[12].size=4;T[12].t=NULL;
+    strcpy(T[13].name,"unsigned short");T[13].size=1;T[13].t=NULL;
+    strcpy(T[14].name,"unsigned char");T[14].size=1;T[14].t=NULL;
+    strcpy(T[15].name,"signed char");T[15].size=1;T[15].t=NULL;
+    strcpy(T[16].name,"char");T[16].size=1;T[16].t=NULL;
+    strcpy(T[17].name,"unsigned int");T[17].size=2;T[17].t=NULL;
+    strcpy(T[18].name,"signed int");T[18].size=2;T[18].t=NULL;
+    strcpy(T[19].name,"unsigned");T[19].size=2;T[19].t=NULL;
+    strcpy(T[20].name,"short");T[20].size=1;T[20].t=NULL;
+    strcpy(T[21].name,"float");T[21].size=4;T[21].t=NULL;
+    strcpy(T[22].name,"int");T[22].size=2;T[22].t=NULL;
+}
 Var V[1000];int N=0;
 
 void MultipleComment(ifstream &f, char *s){
@@ -429,4 +449,16 @@ void Show_Res(ofstream &of){
         m=0;bp=0;
         show(of,V[i],0,m,bp);
     }
+}
+
+void deallocVar(Var& v)
+{
+
+    if(v.tp.t)delete[] v.tp.t;
+}
+
+void deaalocMemory()
+{
+    for(unsigned i=0;i<N;++i)
+        deallocVar(V[i]);
 }

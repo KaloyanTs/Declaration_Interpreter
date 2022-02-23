@@ -8,7 +8,7 @@
 #include "Track_Defs.h"
 #include "Date_Time_Tools.h"
 using namespace std;
-#define VERSION "1.0"
+#define VERSION "1.1"
 #define AUTHOR "KaloyanTs"
 #define ProjectNAME "Track_Folder"
 int C=0,fileC=0;
@@ -50,6 +50,7 @@ void Search_Files(char *path, char *file, int lvl){
 }
 
 int main(int argc, char** argv){
+    initTypes();
     char path[300],s[200],t[300];
     char date[24],time[24];
     const char* fileName="Path.txt";
@@ -80,7 +81,7 @@ int main(int argc, char** argv){
            if(d->d_name[d->d_namlen-1]!='c'||d->d_name[d->d_namlen-2]!='.')continue;
             Search_Files(path,d->d_name,0);
             data<<d->d_name<<endl;
-            data<<"// Level; Name; Type; Address offset"<<endl;
+            data<<"// Level; Name; Type; Address offset; Length"<<endl;
             Show_Res(data);
             data.close();
             break;
