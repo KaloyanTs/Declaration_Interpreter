@@ -1,18 +1,19 @@
 // Track_Folder.exe V1.1 by KaloyanTs
-// 11-04-23 7:46:09 PM
-// C:\microC\Simid\Bug_1\main.c
+// 4/18/2023 8:52:01 PM
+// C:\Users\KaloyanTs\Documents\GitHub\Declaration_Interpretator\Bugs\Bugs_1\main.c
 // Level; Name; Type; Address offset; Length
 1;AlarmSound_ds;char;0;1
 1;DI;struct;0;-
   2;B;bit;0.0;-
   2;x;char;1;1
-  2;z;int;2;2
-  2;A;int;4;2
-  2;F;float;6;4
+  2;y;char;2;1
+  2;z;int;3;2
+  2;F;float;5;4
 1;Par;struct;0;-
   2;_;bit;0.0;-
-  2;Pump_SP;int;1;2
-  2;Ratio_1;int;3;2
-  2;Ratio_2;int;5;2
-  2;CoolTime_min;int;7;2
-  2;Pump_Hyst;int;9;2
+  2;Speed_01Hz;int;1;2
+  2;Pump_SP;int;3;2
+  2;Ratio_1;int;5;2
+  2;Ratio_2;int;7;2
+  2;CoolTime_min;int;9;2
+  2;Pump_Hyst;int;11;2
