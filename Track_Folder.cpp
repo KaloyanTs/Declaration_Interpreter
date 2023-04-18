@@ -26,14 +26,14 @@ void Search_Files(char *path, char *file, int lvl){
     if(isSearched(file))return;
     char s[300];
     char c[4];
-    //for(int i=0;i<lvl;i++)cout<<"  ";cout<<lvl+1<<"->";
-    //cout<<path<<file<<endl;
+    //                for(int i=0;i<lvl;i++)cout<<"  ";cout<<lvl+1<<"->";
+    //                cout<<path<<file<<endl;
     ifstream f;
     strcpy(s,path);strcat(s,file);
     f.open(s);
     if(!f.is_open()){/*cout<<file<<" does not exist!"<<endl;*/return;}
     while(!f.eof()){
-        f.getline(s,300);
+        readLine(f,s);
         if(strstr(s,"#include")!=NULL){
             char *a=strstr(s,"\"")+1;
             char *b=strstr(a,"\"");
@@ -56,7 +56,7 @@ int main(int argc, char** argv){
     const char* fileName="Path.txt";
     int c=0;
     ifstream p;p.open(fileName);
-    p.getline(t,300);
+    readLine(p,t);
     p.close();
     for(int i=0;i<strlen(t);i++){
         if(t[i]=='\\')path[c++]='\\';
@@ -88,6 +88,6 @@ int main(int argc, char** argv){
         }
         closedir(dr);
     }
-        remove(fileName);
+        //remove(fileName);
         return 0;
 }

@@ -1,5 +1,13 @@
 using namespace std;
 
+void readLine(ifstream &f, char *s)
+{
+    f.getline(s,300);
+    int spaces=0;
+    while(s[spaces]==' '){++spaces;}
+    memmove(s,s+spaces,sizeof(char)*(150-spaces));
+}
+
 int arr_mem, acc_bits;
 struct Type;
 struct Var;
@@ -87,14 +95,14 @@ void initTypes(){
 Var V[1000];int N=0;
 
 void MultipleComment(ifstream &f, char *s){
-    if(strstr(s,"/*")!=NULL){while(strstr(s,"*/")==NULL)f.getline(s,300);f.getline(s,300);}
+    if(strstr(s,"/*")!=NULL){while(strstr(s,"*/")==NULL)readLine(f,s);readLine(f,s);}
 }
 
 void Define_def(ifstream &f,char *s){
     while(strstr(s,"\\")!=NULL&&(*s!='\0'&&(s[0]!='/'||s[1]!='/'))){
-        f.getline(s,300);
+        readLine(f,s);
     }
-    f.getline(s,300);
+    readLine(f,s);
     if(strstr(s,"#")!=NULL){Define_def(f,s);return;}
     MultipleComment(f,s);
 }
@@ -105,7 +113,7 @@ void Enum_def(ifstream &f,char *s,Var *v,int &n){
     int c=0;
     bool mult=false;
     while(strstr(s,";")==NULL){
-        f.getline(s,300);
+        readLine(f,s);
     }
     char *a=strstr(s,"}")+1;
     while(*a==' '){a++;}
@@ -157,7 +165,7 @@ void Skip_Functions(ifstream &f,char *s){
                 state--;}}
     while(state||!flag){
         do{
-            f.getline(s,300);
+            readLine(f,s);
         }while(*s=='\0');
         a=strstr(s,"{");
         b=strstr(s,"}");
@@ -237,11 +245,12 @@ multiple:
     char nn[300];
     char *y=&s[strlen(s)-1];
     while(*y==' ')*(y--)=0;
-    while(s[strlen(s)-1]==','){f.getline(nn,300);strcat(s,nn);}
+    while(s[strlen(s)-1]==','){readLine(f,nn);strcat(s,nn);}
     char next_dec[300];
     b=strstr(vv.tp.name,"[");
     if(b!=NULL)*b=0;
     strcpy(next_dec,vv.tp.name);
+    strcat(next_dec," ");
     strcat(next_dec,++a);
     return vv.tp.size+Simple_Def(f,next_dec,v,n);
 }
@@ -287,9 +296,10 @@ int Bit_Field(ifstream &f, char *s,Var *v, int &n){
             v[n].tp.bitPart=C%8;
             v[n++].tp.size=C/8;
             do{
-                f.getline(s,300);
+                readLine(f,s);
                 a=strstr(s,":");
-            }while(*s=='\0'||(strstr(s,"//")!=NULL?(strstr(s,"//")-a)<0:0));
+                if(strstr(s,"//")!=NULL&&(strstr(s,"//")-a)<0)return cc;
+            }while(*s=='\0');
     }
     return cc;
 }
@@ -313,7 +323,7 @@ Type Struct_OneLine(ifstream &f, char *s){
     return temp;
 }
 
-void Struct_Def(ifstream &f,char *s,Var *v,int &n, bool isUnion){
+void Struct_Def(ifstream &f,char *s,Var *v,int &n, bool isUnion){   //todo Bugs_2 problems debug here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     int c=0,cc=0;
     Var vv;Type temp;
     char ar_n[8];
@@ -324,7 +334,7 @@ void Struct_Def(ifstream &f,char *s,Var *v,int &n, bool isUnion){
        (strstr(s,"//")!=NULL?strstr(s,"//")-strstr(s,"}")>0:1))
        vv.tp=Struct_OneLine(f,s);
     else{
-        f.getline(s,300);
+        readLine(f,s);
         while(strstr(s,"}")==NULL||strstr(s,"enum")!=NULL){
             if(s[0]!='/'||s[1]!='/'&&*s!='\0'){
                 if(strstr(s,":")!=NULL&&
@@ -333,14 +343,14 @@ void Struct_Def(ifstream &f,char *s,Var *v,int &n, bool isUnion){
                       cc=Bit_Field(f,s,vv.tp.t,vv.tp.ct);
                       vv.tp.size+=(cc%8?cc/8+1:cc/8);
                    }
-                while(strstr(s,"enum")!=NULL){Enum_def(f,s,vv.tp.t,vv.tp.ct);f.getline(s,300);}
+                while(strstr(s,"enum")!=NULL){Enum_def(f,s,vv.tp.t,vv.tp.ct);readLine(f,s);}
                 if(strstr(s,"union")!=NULL)Struct_Def(f,s,vv.tp.t,vv.tp.ct,true);
                 int check=Simple_Def(f,s,vv.tp.t,vv.tp.ct);
                 if(check==-1)check=0;
                 if(!isUnion)vv.tp.size+=check;
                 else vv.tp.size=check;
             }
-            if(strstr(s,"}")==NULL)f.getline(s,300);
+            if(strstr(s,"}")==NULL)readLine(f,s);
         }
     }
     temp=vv.tp;
@@ -387,9 +397,9 @@ void New_Type(ifstream &f,char *s){
        temp=Struct_OneLine(f,s);
     else{
         do{
-            f.getline(s,300);
+            readLine(f,s);
             if(s[0]=='/'&&s[1]=='/'||*s=='\0'){continue;}
-            if(strstr(s,"/*")!=NULL){while(strstr(s,"*/")==NULL)f.getline(s,300);f.getline(s,300);}
+            if(strstr(s,"/*")!=NULL){while(strstr(s,"*/")==NULL)readLine(f,s);readLine(f,s);}
             if(strstr(s,":")!=NULL&&
                (strstr(s,"//")!=NULL?strstr(s,"//")-strstr(s,":")>0:1)
               ){
@@ -399,7 +409,7 @@ void New_Type(ifstream &f,char *s){
             if(strstr(s,"enum")!=NULL)
                 {   int ll=temp.ct;
                     Enum_def(f,s,temp.t,temp.ct);
-                    f.getline(s,300);
+                    readLine(f,s);
                     for(int i=ll;ll<temp.ct;ll++)temp.size+=temp.t[i].tp.size;
                 }
             if(strstr(s,"union")!=NULL)Struct_Def(f,s,temp.t,temp.ct,true);
@@ -429,7 +439,7 @@ void Proceed_Line(ifstream &f,char *s){
             if(strstr(s,"enum")!=NULL){Enum_def(f,s,V,N);return;}
             if(strstr(s,"const")!=NULL){
                 if(strstr(s,";")!=NULL)return;
-                do{f.getline(s,300);}
+                do{readLine(f,s);}
                 while(strstr(s,"}")==NULL||strstr(s,";")==NULL);
             }
             if(strstr(s,"(")!=NULL){
