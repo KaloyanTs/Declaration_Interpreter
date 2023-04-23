@@ -8,7 +8,7 @@
 #include "Track_Defs.h"
 #include "Date_Time_Tools.h"
 using namespace std;
-#define VERSION "1.1"
+#define VERSION "1.2"
 #define AUTHOR "KaloyanTs"
 #define ProjectNAME "Track_Folder"
 int C=0,fileC=0;
