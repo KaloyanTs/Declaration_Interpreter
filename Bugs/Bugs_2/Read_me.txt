@@ -45,8 +45,8 @@
     3;Int_Alarm_Time_cs;int;24;2
     3;Int_On_2sec_ds;int;26;2
     3;Animation;int;28;2
-    3;Index;int;30;2               - Тук имаме Offset:30 и дължина на типа:2
-  2;Feed_Gate;type_Motion;33;-     - Тук имаме Offset:33 вместо 32! (30+2)	
+    3;Index;int;30;2               - РўСѓРє РёРјР°РјРµ Offset:30 Рё РґСЉР»Р¶РёРЅР° РЅР° С‚РёРїР°:2
+  2;Feed_Gate;type_Motion;33;-     - РўСѓРє РёРјР°РјРµ Offset:33 РІРјРµСЃС‚Рѕ 32! (30+2)	
     3;i_On_Delay_NextObj;bit;33.0;-
     3;i_Off_Delay_PrevObj;bit;33.1;-
     3;i_Manual_On;bit;33.2;-
@@ -75,7 +75,7 @@
     3;Int_On_2sec_ds;int;55;2
     3;Animation;int;57;2
     3;Index;int;59;2                 
-  2;Drum;type_Motion;62;-                - Тук също!
+  2;Drum;type_Motion;62;-                - РўСѓРє СЃСЉС‰Рѕ!
     3;i_On_Delay_NextObj;bit;62.0;-
     3;i_Off_Delay_PrevObj;bit;62.1;-
     3;i_Manual_On;bit;62.2;-

@@ -88,6 +88,6 @@ int main(int argc, char** argv){
         }
         closedir(dr);
     }
-        //remove(fileName);
+        remove(fileName);
         return 0;
 }
