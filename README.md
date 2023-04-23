@@ -1,3 +1,7 @@
 # Declaration_Interpretator
 
- The project is not working perfectly - dependant on one's writing style
+ Tracing of all decrared variables in a C project
+ 
+## Warning!
+
+ The program is not fully independent of the code; can be considered as a good coding style interpreter.
